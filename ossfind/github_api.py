@@ -77,11 +77,15 @@ def get_user(username):
     return None
 
 
-def search_repositories(keyword):
+def search_repositories(keyword, language=None):
     url = f"{GITHUB_API}/search/repositories"
 
+    query = keyword
+    if language:
+        query = f"{query} language:{language}"
+
     params = {
-        "q": keyword,
+        "q": query,
         "sort": "stars",
         "order": "desc",
         "per_page": 10
