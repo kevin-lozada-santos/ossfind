@@ -23,7 +23,7 @@ def main():
     if len(sys.argv) < 2:
         print("Usage:")
         print("  ossfind login")
-        print("  ossfind search <keyword>")
+        print("  ossfind search <keyword> [--language <lang>]")
         print("  ossfind user <username>")
         print("  ossfind whoami")
         print("  ossfind trending")
@@ -50,9 +50,17 @@ def main():
             return
 
         keyword = sys.argv[2]
+        language = None
+
+        if "--language" in sys.argv[3:]:
+            language_index = sys.argv.index("--language")
+            if language_index + 1 >= len(sys.argv):
+                print("Please provide a language after --language")
+                return
+            language = sys.argv[language_index + 1]
 
         try:
-            repos = search_repositories(keyword)
+            repos = search_repositories(keyword, language=language)
         except GitHubAPIError as error:
             print(f"Search failed: {error}")
             return
