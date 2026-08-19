@@ -1,0 +1,33 @@
+name: PR Welcome Comment
+
+# Welcome every newly opened pull request. pull_request_target (not
+# pull_request) is deliberate: it runs in the base repo's context, so the
+# token can comment on PRs opened from forks — the usual shape for this
+# project — which a plain pull_request workflow's read-only token cannot.
+#
+# Safety: the workflow never checks out the pull request's code and never
+# runs anything from it. The script only reads the PR metadata and posts a
+# comment, so no untrusted input reaches a step with write permissions.
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post welcome comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const author = context.payload.pull_request.user.login;
+            const message = `Hi @${author}, thank you for opening this pull request to OSSFind! We appreciate your contribution and will review it shortly.`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: message,
+            });
