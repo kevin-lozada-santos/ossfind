@@ -99,6 +99,37 @@ def search_repositories(keyword, language=None):
     return []
 
 
+def search_good_first_issues(language=None, repository=None):
+    url = f"{GITHUB_API}/search/issues"
+
+    query = 'is:issue is:open label:"good first issue"'
+    if language:
+        query = f"{query} language:{language}"
+    if repository:
+        query = f"{query} repo:{repository}"
+
+    params = {
+        "q": query,
+        "per_page": 10
+    }
+
+    response = _request(url, params=params)
+
+    if response.status_code == 200:
+        return response.json()["items"]
+
+    return []
+
+
+def get_repository_language(repository_url):
+    response = _request(repository_url)
+
+    if response.status_code == 200:
+        return response.json().get("language")
+
+    return None
+
+
 def get_authenticated_user(token):
     url = f"{GITHUB_API}/user"
 
